@@ -85,8 +85,6 @@
     line-height: 1.55;
   }
   pre code { background: none; border: none; padding: 0; }
-  ul { margin: 1rem 0 1rem 1.4rem; color: var(--muted); }
-  li { margin-bottom: 0.4rem; }
   .note {
     background: var(--accent-soft);
     border-left: 3px solid var(--accent);
@@ -96,12 +94,6 @@
     font-size: 0.95rem;
     color: var(--text);
   }
-  table { border-collapse: collapse; margin: 1rem 0; width: 100%; font-size: 0.95rem; }
-  th, td { border: 1px solid var(--border); padding: 0.55rem 0.9rem; text-align: left; }
-  th { background: var(--panel); color: var(--accent); }
-  td { color: var(--muted); }
-  .back { display: inline-block; margin-top: 3rem; color: var(--accent); text-decoration: none; font-size: 0.95rem; }
-  .back:hover { text-decoration: underline; }
   footer {
     border-top: 1px solid var(--border);
     color: var(--muted);
@@ -109,114 +101,44 @@
     text-align: center;
     padding: 1.5rem;
   }
-  .view { display: none; }
-  .view.active { display: block; }
 </style>
 </head>
 <body>
 
 <header>
-  <a class="logo" href="#" onclick="showView('home'); return false;">⌨️ Kanata <span>Tutorials</span></a>
+  <a class="logo" href="index.html">⌨️ Kanata <span>Tutorials</span></a>
   <nav>
-    <a href="#" onclick="showView('home'); return false;">Home</a>
-    <a href="#" onclick="showView('caps-to-esc'); return false;">Caps → Esc</a>
+    <a href="index.html">Home</a>
+    <a href="caps-to-esc.html">Caps → Esc</a>
   </nav>
 </header>
 
 <main>
-  <!-- ===================== HOMEPAGE ===================== -->
-  <section id="view-home" class="view active">
-    <h1>Welcome to the Kanata Tutorial Hub</h1>
-    <p class="lede">Practical, copy‑paste tutorials for <strong>Kanata</strong> — the cross‑platform keyboard remapper that lets you redefine your keys with a simple Lisp‑like configuration language.</p>
+  <h1>Welcome to the Kanata Tutorial Hub</h1>
+  <p class="lede">Practical, copy‑paste tutorials for <strong>Kanata</strong> — the cross‑platform keyboard remapper that lets you redefine your keys with a simple Lisp‑like configuration language.</p>
 
-    <a class="card" href="#" onclick="showView('caps-to-esc'); return false;">
-      <span class="arrow">→</span>
-      <h3>Caps Lock → Escape</h3>
-      <p>Turn Caps Lock into an Escape key — a must-have tweak for Vim users and terminal dwellers.</p>
-    </a>
+  <a class="card" href="caps-to-esc.html">
+    <span class="arrow">→</span>
+    <h3>Caps Lock → Escape</h3>
+    <p>Turn Caps Lock into an Escape key — a must-have tweak for Vim users and terminal dwellers.</p>
+  </a>
 
-    <h2>What is Kanata?</h2>
-    <p>Kanata is a keyboard remapping daemon for Windows, macOS, and Linux. You describe your desired key behavior in a plain-text configuration file, and Kanata intercepts and transforms your keystrokes system-wide — no driver hacking required.</p>
+  <h2>What is Kanata?</h2>
+  <p>Kanata is a keyboard remapping daemon for Windows, macOS, and Linux. You describe your desired key behavior in a plain-text configuration file, and Kanata intercepts and transforms your keystrokes system-wide — no driver hacking required.</p>
 
-    <h2>Anatomy of a config</h2>
-    <pre><code>(defcfg        ; global settings, e.g. process-unreleased-keys
+  <h2>Anatomy of a config</h2>
+  <pre><code>(defcfg        ; global settings, e.g. process-unreleased-keys
 (defsrc caps   ; the physical keys you want to act on
 (deflayer base ; how those keys behave in this layer
 (defalias      ; reusable actions, referenced with @name</code></pre>
 
-    <div class="note">
-      ℹ️ Every tutorial here assumes a working Kanata installation. Grab binaries or build from source from the
-      official repo: <code>github.com/jtroo/kanata</code>. On Linux you'll need uinput permissions; on Windows run as administrator for it to work everywhere.
-    </div>
-  </section>
-
-  <!-- ===================== CAPS → ESC PAGE ===================== -->
-  <section id="view-caps-to-esc" class="view">
-    <h1>Caps Lock → Escape</h1>
-    <p class="lede">Repurpose Caps Lock as an Escape key. Your pinkies (and your Vim workflow) will thank you.</p>
-
-    <h2>The alias</h2>
-    <p>We define a reusable alias called <code>caps-to-esc</code> using the <code>tap-hold</code> action:</p>
-
-<pre><code>(defalias caps-to-esc
-  (tap-hold 100 100 esc esc)
-)</code></pre>
-
-    <h2>How <code>tap-hold</code> works</h2>
-    <p><code>tap-hold</code> takes four arguments: <code>(tap-hold timeout permissive-hold tap hold)</code>. Tap outputs the <em>tap</em> action on a quick press-and-release; holding outputs the <em>hold</em> action. Both are set to <code>esc</code> here.</p>
-
-    <table>
-      <tr><th>Value</th><th>Meaning</th></tr>
-      <tr><td>first <code>100</code></td><td>Timeout (ms): press longer than this and it counts as a hold</td></tr>
-      <tr><td>second <code>100</code></td><td>Permissive-hold window (ms): another keypress within this window triggers the hold action</td></tr>
-      <tr><td>first <code>esc</code></td><td>Action on tap → sends <code>Esc</code></td></tr>
-      <tr><td>second <code>esc</code></td><td>Action on hold → also <code>Esc</code></td></tr>
-    </table>
-
-    <h2>Wiring it up</h2>
-    <p>Since tap and hold are identical here, the timing behaves transparently: a quick tap gives Escape, and there's no downside to a longer press. Drop the alias into a full, minimal config:</p>
-
-<pre><code>(defcfg process-unreleased-keys yes)
-
-(defsrc caps
-(deflayer base
-  @caps-to-esc
-)
-
-(defalias caps-to-esc
-  (tap-hold 100 100 esc esc)
-)</code></pre>
-
-    <div class="note">
-      💡 The <code>@</code> prefix is how layers reference actions defined in <code>defalias</code>.
-    </div>
-
-    <h2>Trying it out</h2>
-    <ul>
-      <li>Save the config (e.g. <code>kanata.kbd</code>)</li>
-      <li>Run <code>kanata -c kanata.kbd</code> (on Windows, launch as administrator)</li>
-      <li>Tap Caps Lock in any editor — you should see <code>Esc</code></li>
-    </ul>
-
-    <h2>Taking it further</h2>
-    <p>A common upgrade is making Caps Lock <em>Escape when tapped, Control when held</em>:</p>
-    <pre><code>(defalias caps-to-esc-ctrl
-  (tap-hold 100 100 esc lctl)
-)</code></pre>
-    <p>Same alias structure — just change the hold action. Great for Ctrl+anything chords without stretching your pinky.</p>
-
-    <a class="back" href="#" onclick="showView('home'); return false;">← Back to homepage</a>
-  </section>
+  <div class="note">
+    ℹ️ Every tutorial here assumes a working Kanata installation. Grab binaries or build from source from the
+    official repo: <code>github.com/jtroo/kanata</code>. On Linux you'll need uinput permissions; on Windows run as administrator for it to work everywhere.
+  </div>
 </main>
 
 <footer>Kanata Tutorial Hub · community-driven, no key harmed</footer>
 
-<script>
-  function showView(id) {
-    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-    document.getElementById('view-' + id).classList.add('active');
-    window.scrollTo(0, 0);
-  }
-</script>
 </body>
 </html>
